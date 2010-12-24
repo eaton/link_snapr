@@ -1,0 +1,53 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Sets up a custom formatter for Link elements, outputs WebSnapr thumbnails.
+ */
+
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function link_snapr_field_formatter_info() {
+  return array(
+    // This formatter just displays the hex value in the color indicated.
+    'link_snapr' => array(
+      'label' => t('WebSnapr thumbnail'),
+      'field types' => array('link_field'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * Two formatters are implemented.
+ * - link_snapr just outputs an image tag pointing tou WebSnapr's thumbnail
+ *   generation endpoint.
+ */
+function link_snapr_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'link_snapr':
+      foreach ($items as $delta => $item) {
+        $scheme = parse_url($item['url'], PHP_URL_SCHEME) .'://';
+        $url = str_replace($scheme, '', $item['url']);
+
+        $variables = array(
+          'path' => 'http://images.websnapr.com/?size=S&url='. urlencode($url), 
+          'alt' => empty($item['title'] )? $item['url'] : $item['title'],
+          'title' => empty($item['title'] )? $item['url'] : $item['title'],
+          'width' => '202',
+          'height' => '152',
+        );
+        $img = theme('image', $variables);
+        $element[$delta]['#markup'] = l($img, $item['url'], array('html' => TRUE, 'attributes' => $item['attributes']));
+      }
+      break;
+  }
+
+  return $element;
+}

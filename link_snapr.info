@@ -1,0 +1,7 @@
+; $Id$
+name = Link Snapr
+description = Formats CCK Link fields as WebSnapr.com thumbnails.
+core = 7.x
+package = Fields
+
+files[] = link_snapr.module
